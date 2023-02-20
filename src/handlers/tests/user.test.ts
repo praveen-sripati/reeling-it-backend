@@ -1,6 +1,4 @@
-import { Request, Response } from 'express';
 import { describe, expect, it } from 'vitest';
-import { createNewUser } from '../user';
 
 describe('user handler', () => {
   // it('should create a new user', async () => {

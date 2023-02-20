@@ -1,3 +1,3 @@
-export default {
+export const local = {
   port: 3000,
 };

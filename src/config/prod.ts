@@ -1,4 +1,3 @@
-export default {
-  // port: process.env.PORT,
+export const prod = {
   port: process.env.PORT,
 };
