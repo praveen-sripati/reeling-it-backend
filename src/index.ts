@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import config from './config';
 import { CustomError, errorType } from './error';
 
 dotenv.config();
@@ -17,6 +18,6 @@ process.on('uncaughtException', () => {
 
 import app from './server';
 
-app.listen(3000, () => {
-  console.log('listening at http://localhost:3000');
+app.listen(config.port, () => {
+  console.log(`listening at http://localhost:${config.port}`);
 });
