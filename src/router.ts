@@ -7,9 +7,9 @@ router.get('/movies', (req, res) => {
   res.status(200);
   res.json({ message: 'hellow from movies' });
 });
-// router.get('/movie:id', () => {});
-// router.put('/movie:id', () => {});
-// router.post('/movie', () => {});
-// router.delete('/movie:id', () => {});
+router.get('/movie:id', () => {});
+router.put('/movie:id', () => {});
+router.post('/movie', () => {});
+router.delete('/movie:id', () => {});
 
 export default router;
