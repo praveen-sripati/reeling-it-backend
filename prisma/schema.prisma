@@ -1,0 +1,263 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model access_log {
+  time      DateTime @default(now()) @db.Timestamptz(6)
+  client_ip String?  @db.Inet
+  page      String
+  path      String
+  runtime   Float?
+
+  @@ignore
+}
+
+model casts {
+  movie_id  BigInt
+  person_id BigInt
+  job_id    BigInt
+  role      String
+  position  Int
+  jobs      jobs   @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  movies    movies @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  people    people @relation(fields: [person_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, person_id, job_id, role, position])
+}
+
+model categories {
+  id                                                BigInt             @id
+  parent_id                                         BigInt?
+  root_id                                           BigInt?
+  name                                              String?
+  categories_categories_parent_idTocategories       categories?        @relation("categories_parent_idTocategories", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_categories_categories_parent_idTocategories categories[]       @relation("categories_parent_idTocategories")
+  categories_categories_root_idTocategories         categories?        @relation("categories_root_idTocategories", fields: [root_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_categories_categories_root_idTocategories   categories[]       @relation("categories_root_idTocategories")
+  category_names                                    category_names[]
+  movie_categories                                  movie_categories[]
+  movie_keywords                                    movie_keywords[]
+}
+
+model category_names {
+  category_id BigInt
+  name        String?
+  language    String
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([category_id, language])
+}
+
+model image_ids {
+  id             BigInt          @id
+  object_id      BigInt?
+  object_type    String?
+  image_version  Int?
+  image_licenses image_licenses?
+}
+
+model image_licenses {
+  image_id   BigInt    @id
+  source     String?
+  license_id BigInt?
+  author     String?
+  image_ids  image_ids @relation(fields: [image_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model job_names {
+  job_id   BigInt
+  name     String?
+  language String
+  jobs     jobs    @relation(fields: [job_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([job_id, language])
+}
+
+model jobs {
+  id        BigInt      @id
+  name      String?
+  casts     casts[]
+  job_names job_names[]
+}
+
+model movie_abstracts_de {
+  movie_id BigInt  @id
+  abstract String?
+  movies   movies  @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model movie_abstracts_en {
+  movie_id BigInt  @id
+  abstract String?
+  movies   movies  @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model movie_abstracts_es {
+  movie_id BigInt  @id
+  abstract String?
+  movies   movies  @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model movie_abstracts_fr {
+  movie_id BigInt  @id
+  abstract String?
+  movies   movies  @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model movie_aliases_iso {
+  movie_id             BigInt
+  name                 String
+  language             String
+  official_translation Int
+  movies               movies @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, name, language, official_translation])
+}
+
+model movie_categories {
+  movie_id    BigInt
+  category_id BigInt
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  movies      movies     @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, category_id])
+}
+
+model movie_countries {
+  movie_id BigInt
+  country  String
+  movies   movies @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, country])
+}
+
+model movie_keywords {
+  movie_id    BigInt
+  category_id BigInt
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  movies      movies     @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, category_id])
+}
+
+model movie_languages {
+  movie_id BigInt
+  language String
+  movies   movies @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, language])
+}
+
+model movie_links {
+  source   String?
+  key      String
+  movie_id BigInt
+  language String
+  movies   movies  @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, language, key])
+}
+
+model movie_references {
+  movie_id                                      BigInt
+  referenced_id                                 BigInt
+  type                                          String
+  movies_movie_references_movie_idTomovies      movies @relation("movie_references_movie_idTomovies", fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  movies_movie_references_referenced_idTomovies movies @relation("movie_references_referenced_idTomovies", fields: [referenced_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, referenced_id, type])
+}
+
+model movies {
+  id                                                      BigInt              @id
+  name                                                    String?
+  parent_id                                               BigInt?
+  date                                                    DateTime?           @db.Date
+  series_id                                               BigInt?
+  kind                                                    kind?
+  runtime                                                 Int?
+  budget                                                  Decimal?            @db.Decimal
+  revenue                                                 Decimal?            @db.Decimal
+  homepage                                                String?
+  vote_average                                            Decimal?            @db.Decimal
+  votes_count                                             BigInt?
+  casts                                                   casts[]
+  movie_abstracts_de                                      movie_abstracts_de?
+  movie_abstracts_en                                      movie_abstracts_en?
+  movie_abstracts_es                                      movie_abstracts_es?
+  movie_abstracts_fr                                      movie_abstracts_fr?
+  movie_aliases_iso                                       movie_aliases_iso[]
+  movie_categories                                        movie_categories[]
+  movie_countries                                         movie_countries[]
+  movie_keywords                                          movie_keywords[]
+  movie_languages                                         movie_languages[]
+  movie_links                                             movie_links[]
+  movie_references_movie_references_movie_idTomovies      movie_references[]  @relation("movie_references_movie_idTomovies")
+  movie_references_movie_references_referenced_idTomovies movie_references[]  @relation("movie_references_referenced_idTomovies")
+  movies_movies_parent_idTomovies                         movies?             @relation("movies_parent_idTomovies", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_movies_movies_parent_idTomovies                   movies[]            @relation("movies_parent_idTomovies")
+  movies_movies_series_idTomovies                         movies?             @relation("movies_series_idTomovies", fields: [series_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  other_movies_movies_series_idTomovies                   movies[]            @relation("movies_series_idTomovies")
+  trailers                                                trailers[]
+}
+
+model people {
+  id             BigInt           @id
+  name           String?
+  birthday       DateTime?        @db.Date
+  deathday       DateTime?        @db.Date
+  gender         Int?
+  casts          casts[]
+  people_aliases people_aliases[]
+  people_links   people_links[]
+}
+
+model people_aliases {
+  person_id BigInt
+  name      String
+  people    people @relation(fields: [person_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([person_id, name])
+}
+
+model people_links {
+  source    String?
+  key       String
+  person_id BigInt
+  language  String
+  people    people  @relation(fields: [person_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([person_id, language, key])
+}
+
+model trailers {
+  trailer_id BigInt
+  key        String?
+  movie_id   BigInt
+  language   String?
+  source     String?
+  movies     movies  @relation(fields: [movie_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([movie_id, trailer_id])
+}
+
+enum kind {
+  movie
+  series
+  season
+  episode
+  movieseries
+}
+
+model User {
+  id String @id @default(uuid())
+  createdAt DateTime @default(now())
+  username String @unique
+  password String
+}

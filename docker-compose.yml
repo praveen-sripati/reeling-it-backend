@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  pgadmin:
+    container_name: movie-database-pgadmin
+    image: dpage/pgadmin4
+    env_file: .env
+    volumes:
+      - ./pgadmin:/var/lib/pgadmin
+    ports:
+      - 1234:80
+    depends_on:
+      - db
+  db:
+    container_name: movie-database
+    build: .
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env
+    volumes:
+      - ./postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
+  pgadmin:
