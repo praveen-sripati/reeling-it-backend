@@ -1,4 +1,4 @@
-name: CI
+name: Development
 
 on:
   pull_request:
@@ -15,21 +15,21 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ 14, 16 ]
+        node: [14, 16]
     timeout-minutes: 10
     steps:
-      - name: "☁️ checkout repository"
+      - name: '☁️ checkout repository'
         uses: actions/checkout@v3.3.0
 
-      - name: "🔧 setup node"
+      - name: '🔧 setup node'
         uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ matrix.node }}
 
-      - name: "📦 install dependencies"
+      - name: '📦 install dependencies'
         run: npm ci
 
-      - name: "🔍 run tests"
+      - name: '🔍 run tests'
         run: npm test --if-present
 
   lint:
@@ -37,19 +37,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node: [ 14, 16 ]
+        node: [14, 16]
     timeout-minutes: 10
     steps:
-      - name: "☁️ checkout repository"
+      - name: '☁️ checkout repository'
         uses: actions/checkout@v3.3.0
 
-      - name: "🔧 setup node"
+      - name: '🔧 setup node'
         uses: actions/setup-node@v3.6.0
         with:
           node-version: ${{ matrix.node }}
 
-      - name: "📦 install dependencies"
+      - name: '📦 install dependencies'
         run: npm ci
-        
-      - name: "🔍 lint code"
+
+      - name: '🔍 lint code'
         run: npm run lint --if-present
