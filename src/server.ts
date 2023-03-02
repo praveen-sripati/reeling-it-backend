@@ -22,16 +22,19 @@ app.get('/', (req, res) => {
   // console.log('hello from express');
   // res.status(200);
   res.json({ message: 'hello' });
-  throw new Error("Error in '/' route");
+  // throw new Error("Error in '/' route");
 });
 
-app.use('/api', protect, router);
 app.post('/signup', validateSignUpInputs, validateInputs, createNewUser);
 app.post('/signin', validateSignInInputs, validateInputs, signIn);
+app.use('/api', protect, router);
 
 // Custom Error Middleware to catch errors
-app.use((err: CustomError, req: Request, res: Response, next: NextFunction) => {
-  customErrorMiddleware(err, req, res, next);
-});
+app.use(
+  (err: CustomError, req: Request, res: Response, _next: NextFunction) => {
+    console.log('res ----------->', res);
+    customErrorMiddleware(err, req, res);
+  }
+);
 
 export default app;

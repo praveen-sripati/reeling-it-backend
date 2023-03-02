@@ -40,8 +40,7 @@ export class CustomError extends Error {
 export const customErrorMiddleware = (
   err: CustomError,
   _req: Request,
-  res: Response,
-  _next: NextFunction
+  res: Response
 ) => {
   res.status(err.status ?? 400);
   res.json({

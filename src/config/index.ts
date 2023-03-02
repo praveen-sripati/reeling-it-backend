@@ -26,6 +26,8 @@ export default merge(
     secrets: {
       jwt: process.env.JWT_SECRET,
     },
+    omdbApiBaseUrl: process.env.OMDB_API_BASE_URL,
+    omdbApiApiKey: process.env.OMDB_API_API_KEY,
   },
   envConfig
 );
