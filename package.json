@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node src/index.ts",
-    "prettier": "prettier --write '**/*.{ts,json,md,hbs,yml,js}'",
+    "format": "prettier --write '**/*.{ts,json,md,hbs,yml,js}'",
     "lint": "eslint '*/**/*.ts' --quiet --fix",
     "test": "vitest",
     "test-ui": "vitest --ui",
