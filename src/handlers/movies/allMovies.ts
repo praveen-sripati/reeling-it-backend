@@ -15,6 +15,8 @@ export const allMovies = async (
   if (genre && genre.length > 0) {
     genres = genre.split(',');
   }
+  const dateRangeLowerYear = +req.query.year_lower;
+  const dateRangeUpperYear = +req.query.year_upper;
   const page = +req.query.page;
   const limit = +req.query.limit;
   const skip = page * limit - limit;
@@ -32,10 +34,20 @@ export const allMovies = async (
 
   try {
     let totalMoviesWithGenre = 0;
-    if (genres.length > 0 && genres.includes('allmovies')) {
-      totalMoviesWithGenre = await getTotalMoviesWithGenre(search);
+    if (genres.includes('allmovies')) {
+      totalMoviesWithGenre = await getTotalMoviesWithGenre(
+        search,
+        dateRangeLowerYear,
+        dateRangeUpperYear
+      );
     } else {
-      totalMoviesWithGenre = await getTotalMoviesWithGenre(search, genres);
+      totalMoviesWithGenre = await getTotalMoviesWithGenre(
+        search,
+        dateRangeLowerYear,
+        dateRangeUpperYear,
+        genres
+      );
+      console.log('total movies count => ', totalMoviesWithGenre);
     }
     const totalMoviePagesWithFilters = getTotalPages(
       totalMoviesWithGenre,
@@ -44,7 +56,14 @@ export const allMovies = async (
 
     console.log('totalMoviesWithGenre', totalMoviesWithGenre);
 
-    let movies = await getMovies(skip, limit, search, genres);
+    let movies = await getMovies(
+      skip,
+      limit,
+      search,
+      genres,
+      dateRangeLowerYear,
+      dateRangeUpperYear
+    );
 
     const moviePosters = await getMoviePosters(movies);
 
@@ -53,6 +72,7 @@ export const allMovies = async (
     res.json({
       data: {
         movies,
+        total_items: totalMoviesWithGenre,
         total_pages: totalMoviePagesWithFilters,
       },
     });
@@ -70,12 +90,21 @@ export const allMovies = async (
 
 // Getters starts
 
-const getTotalMoviesWithGenre = async (search, genres = null) => {
+const getTotalMoviesWithGenre = async (
+  search,
+  dateRangeLowerYear,
+  dateRangeUpperYear,
+  genres = null
+) => {
   if (!genres) {
     return prisma.movies.count({
       where: {
         NOT: [{ date: null }, { kind: null }, { name: null }],
         kind: 'movie',
+        date: {
+          gte: new Date(`${dateRangeLowerYear}-01-01`),
+          lte: new Date(`${dateRangeUpperYear}-12-31`),
+        },
         name: {
           contains: search,
           mode: 'insensitive',
@@ -91,6 +120,10 @@ const getTotalMoviesWithGenre = async (search, genres = null) => {
         contains: search,
         mode: 'insensitive',
       },
+      date: {
+        gte: new Date(`${dateRangeLowerYear}-01-01`),
+        lte: new Date(`${dateRangeUpperYear}-12-31`),
+      },
       movie_categories: {
         some: {
           categories: {
@@ -105,6 +138,7 @@ const getTotalMoviesWithGenre = async (search, genres = null) => {
 };
 
 const getTotalPages = (totalMoviesCount: number, limit: number) => {
+  console.log(' totalMoviesCount => ', totalMoviesCount);
   return Math.ceil(totalMoviesCount / limit);
 };
 
@@ -112,9 +146,11 @@ const getMovies = async (
   skip: number,
   limit: number,
   search: string,
-  genres: string[]
+  genres: string[],
+  dateRangeLowerYear: number,
+  dateRangeUpperYear: number
 ) => {
-  if (genres.length > 0 && genres.includes('allmovies')) {
+  if (genres.includes('allmovies')) {
     return prisma.movies.findMany({
       skip,
       take: limit,
@@ -134,6 +170,10 @@ const getMovies = async (
       where: {
         NOT: [{ date: null }, { kind: null }, { name: null }],
         kind: 'movie',
+        date: {
+          gte: new Date(`${dateRangeLowerYear}-01-01`),
+          lte: new Date(`${dateRangeUpperYear}-12-31`),
+        },
         name: { contains: search, mode: 'insensitive' },
       },
       orderBy: {
@@ -161,6 +201,10 @@ const getMovies = async (
         NOT: [{ date: null }, { kind: null }, { name: null }],
         kind: 'movie',
         name: { contains: search, mode: 'insensitive' },
+        date: {
+          gte: new Date(`${dateRangeLowerYear}-01-01`),
+          lte: new Date(`${dateRangeUpperYear}-12-31`),
+        },
         movie_categories: {
           some: {
             categories: {
