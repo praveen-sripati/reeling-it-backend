@@ -6,3 +6,7 @@ pgadmin/
 postgres/
 coverage/
 html/
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
