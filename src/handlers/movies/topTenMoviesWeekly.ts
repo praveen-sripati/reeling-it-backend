@@ -12,6 +12,7 @@ export const topTenMoviesWeekly = async (
   try {
     const movies = await prisma.movies.findMany({
       select: {
+        id: true,
         name: true,
         date: true,
         votes_count: true,
@@ -33,7 +34,7 @@ export const topTenMoviesWeekly = async (
     const updateMovies = movies
       .filter((movie) => movie.votes_count)
       .concat(movies.filter((movie) => !movie.votes_count))
-      .map((movie) => ({ name: movie.name, date: movie.date }));
+      .map((movie) => ({ id: movie.id, name: movie.name, date: movie.date }));
 
     const movieWithPosters = await Promise.all(
       updateMovies.map(async (movie) => {

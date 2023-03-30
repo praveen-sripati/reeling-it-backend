@@ -44,6 +44,7 @@ export const searchMovies = async (
       skip: skip,
       take: limit,
       select: {
+        id: true,
         name: true,
         date: true,
       },

@@ -155,6 +155,7 @@ const getMovies = async (
       skip,
       take: limit,
       select: {
+        id: true,
         name: true,
         date: true,
         movie_categories: {
@@ -185,6 +186,7 @@ const getMovies = async (
       skip,
       take: limit,
       select: {
+        id: true,
         name: true,
         date: true,
         movie_categories: {
@@ -242,6 +244,7 @@ const getMoviePosters = async (
 
 const getMoviesWithPosters = (
   movies: {
+    id: bigint;
     name: string;
     date: Date;
     movie_categories: {

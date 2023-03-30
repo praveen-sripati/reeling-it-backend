@@ -12,6 +12,7 @@ export const yearTwentyThreeBestHits = async (
   try {
     const movies = await prisma.movies.findMany({
       select: {
+        id: true,
         name: true,
         date: true,
         revenue: true,
